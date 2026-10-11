@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>တောင်တွင်းသူ - အိမ်ချက်လက်ရာ အစားအစာများ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for Download Slip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            background-color: #f7fee7;
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-yellow-400 text-emerald-900 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">တောင်တွင်းသူ</h1>
+                    <p class="text-xs text-emerald-200">အိမ်ချက်လက်ရာ အစားအစာများ</p>
+                </div>
+            </div>
+            <button onclick="toggleCart()" class="relative bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded-xl flex items-center space-x-2 transition shadow">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="hidden sm:inline">ခြင်းတောင်း</span>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold shadow">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Menu Section (2 columns on large screen) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Search and Filter Bar -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 space-y-4">
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                    <input type="text" id="search-input" oninput="filterMenu()" placeholder="ဟင်းမည် ရှာရန်..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+                <!-- Categories -->
+                <div id="category-tabs" class="flex overflow-x-auto space-x-2 pb-2 scrollbar-none">
+                    <button onclick="setCategory('all')" class="cat-btn active-cat px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-emerald-800 text-white transition">အားလုံး</button>
+                    <button onclick="setCategory('pork')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ဝက်သား</button>
+                    <button onclick="setCategory('beef')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">အမဲသား</button>
+                    <button onclick="setCategory('chicken')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ကြက်သား</button>
+                    <button onclick="setCategory('mutton')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ဆိတ်သား</button>
+                    <button onclick="setCategory('fish')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ငါး / ငါးခြောက်</button>
+                    <button onclick="setCategory('seasonal')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ရာသီစာ & အခြား</button>
+                </div>
+            </div>
+
+            <!-- Menu Grid -->
+            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Javascript will populate menu items here -->
+            </div>
+        </div>
+
+        <!-- Order / Cart Sidebar (1 column on large screen) -->
+        <div class="space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 sticky top-20">
+                <h2 class="text-lg font-bold text-emerald-900 mb-4 flex items-center justify-between">
+                    <span><i class="fa-solid fa-receipt mr-2"></i>မှာယူမည့် စာရင်း</span>
+                    <button onclick="clearCart()" class="text-xs text-red-500 hover:underline">အားလုံးဖျက်ရန်</button>
+                </h2>
+
+                <!-- Cart Items List -->
+                <div id="cart-items" class="divide-y divide-gray-100 max-h-64 overflow-y-auto mb-4">
+                    <p class="text-gray-400 text-sm text-center py-6">ခြင်းတောင်းထဲတွင် ဟင်းပစ္စည်းများ မရှိသေးပါ။</p>
+                </div>
+
+                <!-- Customer Details Form -->
+                <div class="space-y-3 pt-3 border-t border-gray-100">
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 block mb-1">ဝယ်ယူသူ အမည်</label>
+                        <input type="text" id="cust-name" placeholder="အမည်ထည့်ပါ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 block mb-1">ဖုန်းနံပါတ်</label>
+                        <input type="text" id="cust-phone" placeholder="ဆက်သွယ်ရန် ဖုန်းနံပါတ်" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 block mb-1">ပို့ဆောင်ရမည့် လိပ်စာ</label>
+                        <textarea id="cust-address" rows="2" placeholder="လိပ်စာအပြည့်အစုံ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 block mb-1">ပို့ခ (Delivery Fee) ကျပ်</label>
+                        <input type="number" id="delivery-fee" value="0" oninput="updateTotals()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <!-- Calculation Summary -->
+                <div class="mt-4 pt-4 border-t border-dashed border-gray-200 space-y-2 text-sm">
+                    <div class="flex justify-between text-gray-600">
+                        <span>ဟင်းဖိုးစုစုပေါင်း:</span>
+                        <span id="subtotal-price">0 ကျပ်</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>ပို့ခ:</span>
+                        <span id="delivery-display">0 ကျပ်</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-base text-emerald-900 pt-2 border-t border-gray-100">
+                        <span>စုစုပေါင်းကျသင့်ငွေ:</span>
+                        <span id="grand-total">0 ကျပ်</span>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button onclick="generateSlipModal()" class="w-full mt-5 bg-emerald-800 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>အော်ဒါစလစ် ထုတ်မည်</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Slip Preview Modal -->
+    <div id="slip-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+            <button onclick="closeSlipModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Printable Area -->
+            <div id="printable-slip" class="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-200 space-y-4 text-sm">
+                <div class="text-center border-b border-emerald-200 pb-4">
+                    <h2 class="text-xl font-bold text-emerald-900">တောင်တွင်းသူ</h2>
+                    <p class="text-xs text-gray-600">အိမ်ချက်လက်ရာ အစားအစာများ</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Viber: 09-956692619 | Ph: 09-989289645</p>
+                </div>
+
+                <div class="space-y-1 text-xs text-gray-700 bg-white p-3 rounded-xl border border-emerald-100">
+                    <p><strong>စလစ်ထုတ်ရက်:</strong> <span id="slip-date"></span></p>
+                    <p><strong>ဝယ်ယူသူ:</strong> <span id="slip-name"></span></p>
+                    <p><strong>ဖုန်းနံပါတ်:</strong> <span id="slip-phone"></span></p>
+                    <p><strong>လိပ်စာ:</strong> <span id="slip-address"></span></p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-emerald-900 text-xs mb-2">မှာယူထားသော ဟင်းပစ္စည်းများ:</h4>
+                    <div id="slip-items-list" class="space-y-1.5 text-xs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="border-t border-emerald-200 pt-3 space-y-1 text-xs">
+                    <div class="flex justify-between">
+                        <span>ဟင်းဖိုးစုစုပေါင်း:</span>
+                        <span id="slip-subtotal">0 ကျပ်</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>ပို့ဆောင်ခ:</span>
+                        <span id="slip-delivery">0 ကျပ်</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-emerald-900 text-sm pt-2 border-t border-emerald-200">
+                        <span>စုစုပေါင်းပေးချေရန်:</span>
+                        <span id="slip-total">0 ကျပ်</span>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2 text-[10px] text-gray-500 border-t border-dashed border-emerald-200">
+                    ကျေးဇူးတင်ပါသည် ❤️ တောင်တွင်းသူ စားသောက်ကုန်
+                </div>
+            </div>
+
+            <!-- Download Button -->
+            <button onclick="downloadSlipImage()" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition shadow flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-download"></i>
+                <span>ဖုန်းထဲသို့ စလစ်ပုံ သိမ်းမည် (Download)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-emerald-100 py-4 text-center text-xs text-gray-500 mt-8">
+        <p>တောင်တွင်းသူ အိမ်ချက်လက်ရာ အစားအစာများ © 2026</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Menu Data extracted from source images
+        const menuData = [
+            // Pork
+            { id: 1, name: 'ဝက်မီးကင်', gram: '100 g', price: 30000, category: 'pork' },
+            { id: 2, name: 'ဝက်သားညှင်း', gram: '8 ချောင်း', price: 25000, category: 'pork' },
+            { id: 3, name: 'ဝက်သားတုံးကြော် (ချို)', gram: '15 တုံး', price: 25000, category: 'pork' },
+            { id: 4, name: 'ဝက်သားတုံးကြော် (စပ်)', gram: '15 တုံး', price: 25000, category: 'pork' },
+            { id: 5, name: 'ဝက်သားပေါက်လုံး', gram: '15 လုံး', price: 25000, category: 'pork' },
+            { id: 6, name: 'ဝက်ဥ', gram: '130 g', price: 25000, category: 'pork' },
+            { id: 7, name: 'ဝက်ချောင်း:မာလာစပ်', gram: '160 g', price: 23000, category: 'pork' },
+            { id: 8, name: 'ဝက်ချောင်း:အချို', gram: '170 g', price: 23000, category: 'pork' },
+            { id: 9, name: 'ဝက်ငပိချက်', gram: '200 g', price: 25000, category: 'pork' },
+            { id: 10, name: 'ဝက်ခေါက်ကြော်', gram: '160 g', price: 25000, category: 'pork' },
+
+            // Beef
+            { id: 11, name: 'အမဲသားညှင်း', gram: '8 ချောင်း', price: 25000, category: 'beef' },
+            { id: 12, name: 'အမဲဥ', gram: '130 g', price: 25000, category: 'beef' },
+            { id: 13, name: 'အမဲ လက်ဖက်', gram: '240 g', price: 25000, category: 'beef' },
+            { id: 14, name: 'အမဲသားတုံးကြော် (ချို)', gram: '15 တုံး', price: 25000, category: 'beef' },
+            { id: 15, name: 'အမဲသားတုံးကြော် (စပ်)', gram: '15 တုံး', price: 25000, category: 'beef' },
+            { id: 16, name: 'အမဲပေါက်လုံး', gram: '15 လုံး', price: 25000, category: 'beef' },
+            { id: 17, name: 'အမဲ အသည်း', gram: '150 g', price: 25000, category: 'beef' },
+            { id: 18, name: 'အမဲ အူခွေ', gram: '150 g', price: 25000, category: 'beef' },
+            { id: 19, name: 'အမဲ ခြောက်ဖုတ်', gram: '130 g', price: 25000, category: 'beef' },
+            { id: 20, name: 'အမဲခြောက် အညှာချက်', gram: '200 g', price: 25000, category: 'beef' },
+            { id: 21, name: 'အမဲခြောက် សား:ထောင်း', gram: '200 g', price: 25000, category: 'beef' },
+
+            // Chicken
+            { id: 22, name: 'ဗမာကြက်ကြော်', gram: '350 g', price: 30000, category: 'chicken' },
+            { id: 23, name: 'ကြက်ဥ', gram: '130 g', price: 25000, category: 'chicken' },
+            { id: 24, name: 'ကြက်မီးကင်', gram: '120 g', price: 30000, category: 'chicken' },
+            { id: 25, name: 'ကြက်ပေါက်လုံး', gram: '15 လုံး', price: 25000, category: 'chicken' },
+            { id: 26, name: 'ကြက်အူကြော် (ချို)', gram: '150 g', price: 20000, category: 'chicken' },
+            { id: 27, name: 'ကြက်အူကြော် (စပ်)', gram: '150 g', price: 20000, category: 'chicken' },
+            { id: 28, name: 'ကြက်မြစ်စပ်', gram: '150 g', price: 25000, category: 'chicken' },
+            { id: 29, name: 'ကြက်ချောင်း:မာလာစပ် (ဗူး:အပါ)', gram: '170 g', price: 23000, category: 'chicken' },
+            { id: 30, name: 'ကြက်မြစ်ချို', gram: '150 g', price: 25000, category: 'chicken' },
+
+            // Mutton
+            { id: 31, name: 'ဆိတ်မျှင် အစို', gram: '150 g', price: 25000, category: 'mutton' },
+            { id: 32, name: 'ဆိတ်ဥ', gram: '130 g', price: 25000, category: 'mutton' },
+            { id: 33, name: 'ဆိတ် လက်ဖက်', gram: '240 g', price: 25000, category: 'mutton' },
+            { id: 34, name: 'ဆိတ်သားတုံးကြော်', gram: '15 တုံး', price: 25000, category: 'mutton' },
+            { id: 35, name: 'ဆိတ်သားတုံးစပ်', gram: '-', price: 25000, category: 'mutton' },
+            { id: 36, name: 'ဆိတ်သားညှင်း', gram: '8 ချောင်း', price: 25000, category: 'mutton' },
+            { id: 37, name: 'ဆိတ်ပေါက်လုံး', gram: '15 လုံး', price: 25000, category: 'mutton' },
+            { id: 38, name: 'ဆိတ်ငပိချက်', gram: '200 g', price: 25000, category: 'mutton' },
+            { id: 39, name: 'ဆိတ်မီးကင် (ကြီး) ဗူး:အပါ', gram: '100 g', price: 15000, category: 'mutton' },
+            { id: 40, name: 'ဆိတ်ချောင်း: မာလာ (ချို)', gram: '160 g', price: 20000, category: 'mutton' },
+            { id: 41, name: 'ဆိတ်ချောင်း: မာလာ (စပ်)', gram: '160 g', price: 20000, category: 'mutton' },
+            { id: 42, name: 'ဆိတ်သားပြားကြော် (ချို)', gram: '160 g', price: 25000, category: 'mutton' },
+            { id: 43, name: 'ဆိတ်သားပြားကြော် (စပ်)', gram: '160 g', price: 25000, category: 'mutton' },
+            { id: 44, name: 'ဆိတ်သားကြော် အညာချက်', gram: '230 g', price: 25000, category: 'mutton' },
+            { id: 45, name: 'ဆိတ်သားသား:ထောင်း', gram: '200 g', price: 25000, category: 'mutton' },
+            { id: 46, name: 'ဆိတ်ကလီစာ', gram: '150 g', price: 25000, category: 'mutton' },
+            { id: 47, name: 'ဆိတ်လက်ဖက် ရောတောင်း', gram: '120 g', price: 15000, category: 'mutton' },
+
+            // Fish & Dried Fish
+            { id: 48, name: 'ငါးကြင်းသားငပိချက်', gram: '200 g', price: 20000, category: 'fish' },
+            { id: 49, name: 'ငါးကြင်းသားဥ အချို', gram: '200 g', price: 20000, category: 'fish' },
+            { id: 50, name: 'ငါးခူစဉ်ကော', gram: '220 g', price: 20000, category: 'fish' },
+            { id: 51, name: 'ငါးသေးသေးကြော်', gram: '130 g', price: 15000, category: 'fish' },
+            { id: 52, name: 'ငါးသလဲထိုးကြော်', gram: '130 g', price: 25000, category: 'fish' },
+            { id: 53, name: 'ငါးဖားမ', gram: '200 g', price: 15000, category: 'fish' },
+            { id: 54, name: 'ငါးဖယ်ပြုပ်ကြော်', gram: '130 g', price: 15000, category: 'fish' },
+            { id: 55, name: 'ငါးခြောက်ထောင်း', gram: '200 g', price: 18000, category: 'fish' },
+            { id: 56, name: 'ငါးကွမ်းရှပ် (ချို)', gram: '150 g', price: 15000, category: 'fish' },
+            { id: 57, name: 'ငါးကွမ်းရှပ် (စပ်)', gram: '150 g', price: 15000, category: 'fish' },
+            { id: 58, name: 'ရှယ်ငါးရံ့ခြောက်ဖုတ် (သေး)', gram: '5 ကျပ်သား', price: 20000, category: 'fish' },
+            { id: 59, name: 'ရှယ်ငါးရံ့ခြောက်ဖုတ် (ကြီး)', gram: '10 ကျပ်သား', price: 38000, category: 'fish' },
+            { id: 60, name: 'ပုဇွန်ခြောက်ကြော် ချို/စပ်', gram: '200 g', price: 18000, category: 'fish' },
+            { id: 61, name: 'ငါးဘတ်ခြောက်ချက်', gram: '-', price: 15000, category: 'fish' },
+            { id: 62, name: 'ငါးတံခွန်ကြော်', gram: '220 g', price: 15000, category: 'fish' },
+            { id: 63, name: 'ငါးပုတ်သင်ကြော်', gram: '160 g', price: 15000, category: 'fish' },
+            { id: 64, name: 'ငါးခြောက်အသားပြားကင်', gram: '200 g', price: 20000, category: 'fish' },
+            { id: 65, name: 'ငါးခြောက်အုန်းစို့ချက်', gram: '200 g', price: 18000, category: 'fish' },
+            { id: 66, name: 'ငါးရံ့ခြောက် လက်ဖက်စပ်', gram: '230 g', price: 25000, category: 'fish' },
+            { id: 67, name: 'ပုဇွန်ခြောက် လက်ဖက်စပ်', gram: '230 g', price: 25000, category: 'fish' },
+            { id: 68, name: 'ပုဇွန်ဆိတ်ကြော်', gram: '-', price: 15000, category: 'fish' },
+
+            // Seasonal & Others
+            { id: 69, name: 'မန်ကျည်းသီးစိမ်းချက်', gram: '200 g', price: 10000, category: 'seasonal' },
+            { id: 70, name: 'မန်ကျည်း ပုဇွန်ဆိတ်', gram: '-', price: 12000, category: 'seasonal' },
+            { id: 71, name: 'မန်ကျည်း ငါးဘတ်', gram: '150 g', price: 15000, category: 'seasonal' },
+            { id: 72, name: 'မန်ကျည်း ငါးခူပီကောက်', gram: '150 g', price: 15000, category: 'seasonal' },
+            { id: 73, name: 'မန်ကျည်းမုန့်ညှင်းချဉ်', gram: '200 g', price: 18000, category: 'seasonal' },
+            { id: 74, name: 'မန်ကျည်းရွက်နံကြော်', gram: '200 g', price: 12000, category: 'seasonal' },
+            { id: 75, name: 'မန်ကျည်းရွက် ငါးနီတူ', gram: '200 g', price: 15000, category: 'seasonal' },
+            { id: 76, name: 'ချဉ်ပေါင်ကြော်', gram: '200 g', price: 10000, category: 'seasonal' },
+            { id: 77, name: 'ချဉ်ပေါင်မျှစ်', gram: '-', price: 12000, category: 'seasonal' },
+            { id: 78, name: 'ချဉ်ပေါင် အဆိမ့်ရွက်ကြော်', gram: '-', price: 12000, category: 'seasonal' },
+            { id: 79, name: 'ချဉ်ပေါင် ပုဇွန်ထုတ်', gram: '200 g', price: 20000, category: 'seasonal' },
+            { id: 80, name: 'ကင်ပွန်းချဉ်ကြော်', gram: '200 g', price: 12000, category: 'seasonal' },
+            { id: 81, name: 'ဂွေးသီးကြော်', gram: '230 g', price: 10000, category: 'seasonal' },
+            { id: 82, name: 'ငြัปူးရည်ကြော်', gram: '-', price: 18000, category: 'seasonal' },
+            { id: 83, name: 'အသားတုမာလာချဉ်', gram: '-', price: 12000, category: 'seasonal' },
+            { id: 84, name: 'လယ်ကြွက်ကြော်', gram: '-', price: 18000, category: 'seasonal' },
+            { id: 85, name: 'ဗမာပုထောင်း', gram: '-', price: 10000, category: 'seasonal' },
+            { id: 86, name: 'ရခိုင်ပုထောင်း', gram: '-', price: 15000, category: 'seasonal' },
+            { id: 87, name: 'အညာဂရုသီးစိမ်းကြော်', gram: '-', price: 15000, category: 'seasonal' },
+            { id: 88, name: 'မှိုဆီကြော်', gram: '-', price: 15000, category: 'seasonal' },
+            { id: 89, name: 'ချဉ်ပေါင်ပုဇွန်ဆိတ်', gram: '-', price: 13000, category: 'seasonal' },
+            { id: 90, name: 'ခရမ်းသီးသား:ထောင်း', gram: '-', price: 10000, category: 'seasonal' }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        // Initialize Menu Rendering
+        function renderMenu(items = menuData) {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+            
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-gray-400">ရှာမတွေ့ပါ။ အခြားနာမည်ဖြင့် ရှာကြည့်ပါ။</div>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-col justify-between hover:shadow-md transition';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-emerald-900 text-sm sm:text-base">${item.name}</h3>
+                            <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-medium">${item.gram}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-50">
+                        <span class="text-emerald-800 font-bold text-sm sm:text-base">${item.price.toLocaleString()} ကျပ်</span>
+                        <button onclick="addToCart(${item.id})" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 transition shadow-sm">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>ထည့်မည်</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Category Filter
+        function setCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-800', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-100', 'text-gray-700');
+            event.target.classList.add('bg-emerald-800', 'text-white');
+            
+            filterMenu();
+        }
+
+        // Search and Filter Combination
+        function filterMenu() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            let filtered = menuData;
+
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(item => item.category === currentCategory);
+            }
+
+            if (query.trim() !== '') {
+                filtered = filtered.filter(item => item.name.toLowerCase().includes(query));
+            }
+
+            renderMenu(filtered);
+        }
+
+        // Cart Management
+        function addToCart(id) {
+            const product = menuData.find(item => item.id === id);
+            const existing = cart.find(item => item.id === id);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const countBadge = document.getElementById('cart-count');
+            
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            countBadge.innerText = totalCount;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm text-center py-6">ခြင်းတောင်းထဲတွင် ဟင်းပစ္စည်းများ မရှိသေးပါ။</p>`;
+                updateTotals();
+                return;
+            }
+
+            container.innerHTML = '';
+            cart.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'py-3 flex justify-between items-center';
+                div.innerHTML = `
+                    <div class="pr-2">
+                        <h4 class="font-medium text-xs text-gray-800">${item.name}</h4>
+                        <p class="text-[11px] text-gray-500">${item.price.toLocaleString()} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} ကျပ်</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-xs font-bold">-</button>
+                        <span class="text-xs font-semibold w-4 text-center">${item.qty}</span>
+                        <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg flex items-center justify-center text-xs font-bold">+</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const deliveryFee = parseFloat(document.getElementById('delivery-fee').value) || 0;
+            const grandTotal = subtotal + deliveryFee;
+
+            document.getElementById('subtotal-price').innerText = subtotal.toLocaleString() + ' ကျပ်';
+            document.getElementById('delivery-display').innerText = deliveryFee.toLocaleString() + ' ကျပ်';
+            document.getElementById('grand-total').innerText = grandTotal.toLocaleString() + ' ကျပ်';
+        }
+
+        // Toggle Cart for Mobile View
+        function toggleCart() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Generate Slip Modal
+        function generateSlipModal() {
+            if (cart.length === 0) {
+                alert('ကျေးဇူးပြု၍ ဟင်းပစ္စည်းများ ဦးစွာရွေးချယ်ပါ။');
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+
+            if (!name || !phone || !address) {
+                alert('ကျေးဇူးပြု၍ ဝယ်ယူသူ အမည်၊ ဖုန်းနံပါတ်နှင့် လိပ်စာဖြည့်ပါ။');
+                return;
+            }
+
+            // Populate slip details
+            const now = new Date();
+            document.getElementById('slip-date').innerText = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            document.getElementById('slip-name').innerText = name;
+            document.getElementById('slip-phone').innerText = phone;
+            document.getElementById('slip-address').innerText = address;
+
+            const slipItemsList = document.getElementById('slip-items-list');
+            slipItemsList.innerHTML = '';
+            cart.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between text-gray-700';
+                row.innerHTML = `<span>- ${item.name} (${item.qty} ခု)</span> <span>${(item.price * item.qty).toLocaleString()} ကျပ်</span>`;
+                slipItemsList.appendChild(row);
+            });
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const deliveryFee = parseFloat(document.getElementById('delivery-fee').value) || 0;
+            const grandTotal = subtotal + deliveryFee;
+
+            document.getElementById('slip-subtotal').innerText = subtotal.toLocaleString() + ' ကျပ်';
+            document.getElementById('slip-delivery').innerText = deliveryFee.toLocaleString() + ' ကျပ်';
+            document.getElementById('slip-total').innerText = grandTotal.toLocaleString() + ' ကျပ်';
+
+            document.getElementById('slip-modal').classList.remove('hidden');
+        }
+
+        function closeSlipModal() {
+            document.getElementById('slip-modal').classList.add('hidden');
+        }
+
+        // Download Slip Image using html2canvas
+        function downloadSlipImage() {
+            const slipElement = document.getElementById('printable-slip');
+            html2canvas(slipElement, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `TaungTwineThu_OrderSlip_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Initial Load
+        renderMenu();
+    </script>
+</body>
+</html>
