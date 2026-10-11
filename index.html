@@ -52,7 +52,7 @@
                 </div>
                 <!-- Categories -->
                 <div id="category-tabs" class="flex overflow-x-auto space-x-2 pb-2 scrollbar-none">
-                    <button onclick="setCategory('all')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-emerald-800 text-white transition">အားလုံး</button>
+                    <button onclick="setCategory('all')" class="cat-btn active-cat px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-emerald-800 text-white transition">အားလုံး</button>
                     <button onclick="setCategory('pork')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ဝက်သား</button>
                     <button onclick="setCategory('beef')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">အမဲသား</button>
                     <button onclick="setCategory('chicken')" class="cat-btn px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-700 hover:bg-emerald-100 transition">ကြက်သား</button>
@@ -66,49 +66,7 @@
             <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
         </div>
 
-        <!-- Cart Sidebar -->
+        <!-- Order / Cart Sidebar -->
         <div class="space-y-6">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 sticky top-20">
                 <h2 class="text-lg font-bold text-emerald-900 mb-4 flex items-center justify-between">
-                    <span><i class="fa-solid fa-receipt mr-2"></i>မှာယူမည့် စာရင်း</span>
-                    <button onclick="clearCart()" class="text-xs text-red-500 hover:underline">အားလုံးဖျက်ရန်</button>
-                </h2>
-
-                <div id="cart-items" class="divide-y divide-gray-100 max-h-64 overflow-y-auto mb-4">
-                    <p class="text-gray-400 text-sm text-center py-6">ခြင်းတောင်းထဲတွင် ဟင်းပစ္စည်းများ မရှိသေးပါ။</p>
-                </div>
-
-                <!-- Delivery Fee Only -->
-                <div class="space-y-3 pt-3 border-t border-gray-100">
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600 block mb-1">ပို့ခ (Delivery Fee) ကျပ်</label>
-                        <input type="number" id="delivery-fee" value="0" oninput="updateTotals()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    </div>
-                </div>
-
-                <!-- Calculation Summary -->
-                <div class="mt-4 pt-4 border-t border-dashed border-gray-200 space-y-2 text-sm">
-                    <div class="flex justify-between text-gray-600">
-                        <span>ဟင်းဖိုးစုစုပေါင်း:</span>
-                        <span id="subtotal-price">0 ကျပ်</span>
-                    </div>
-                    <div class="flex justify-between text-gray-600">
-                        <span>ပို့ခ:</span>
-                        <span id="delivery-display">0 ကျပ်</span>
-                    </div>
-                    <div class="flex justify-between font-bold text-base text-emerald-900 pt-2 border-t border-gray-100">
-                        <span>စုစုပေါင်းကျသင့်ငွေ:</span>
-                        <span id="grand-total">0 ကျပ်</span>
-                    </div>
-                </div>
-
-                <button onclick="generateSlipModal()" class="w-full mt-5 bg-emerald-800 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-file-invoice"></i>
-                    <span>အော်ဒါစလစ် ထုတ်မည်</span>
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Slip Preview Modal -->
-    <div id="slip-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center
